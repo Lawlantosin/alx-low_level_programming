@@ -1,52 +1,44 @@
 #include "lists.h"
 
 /**
- * insert_dnodeint_at_index - inserts node at index
- * @h: head of node
- * @idx: index to insert node
- * @n: data for new node
- * Return: list with inserted node
+ * insert_dnodeint_at_index - func to insert node at index
+ * @h: double ptr to the beginning of the list
+ * @idx: index at which to add
+ * @n: data to be added
+ * Return: address of the new node or NULL
  */
 dlistint_t *insert_dnodeint_at_index(dlistint_t **h, unsigned int idx, int n)
 {
-	unsigned int count = 1;
-	dlistint_t *temp = NULL, *new = NULL;
+	dlistint_t *new, *old;
+	unsigned int a;
 
-	new = malloc(sizeof(dlistint_t));
-	if (new == NULL || h == NULL)
+	if (h == NULL)
 		return (NULL);
-	new->n = n;
-	temp = *h;
+
 	if (idx == 0)
+		return (add_dnodeint(h, n));
+
+	old = *h;
+
+	for (a = 0; old != NULL && a < idx; a++)
+		old = old->next;
+
+	if (old == NULL && a == idx)
+		return (add_dnodeint_end(h, n));
+
+	else if (old != NULL)
 	{
-		*h = new;
-		new->next = temp;
-		new->prev = NULL;
-		temp->prev = new;
+		new = malloc(sizeof(dlistint_t));
+
+		if (new == NULL)
+			return (NULL);
+		new->n = n;
+		old->prev->next = new;
+		new->prev = old->prev;
+		old->prev = new;
+		new->next = old;
+
 		return (new);
 	}
-	while (temp->next != NULL)
-	{
-		if (count == idx) /* found back */
-		{
-			new->prev = temp; /* current prev to back link */
-			new->next = temp->next; /* current next to front link*/
-			temp->next = new; /* back next link */
-			new->next->prev = new; /* from prev link */
-		}
-		temp = temp->next;
-		count++;
-	}
-	if (count == idx) /* end of DLL */
-	{
-		new->prev = temp; /* current prev to back link */
-		new->next = NULL; /* current next to NULL*/
-		temp->next = new; /* back next link */
-	}
-	if (count < idx)
-	{
-		free(new);
-		return (NULL);
-	}
-	return (new);
+	return (NULL);
 }
